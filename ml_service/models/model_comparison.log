@@ -1,0 +1,13 @@
+
+=== Training run at 2026-02-25 07:38:00 UTC ===
+LogisticRegression: accuracy=0.5000, precision=0.0000, recall=0.0000, f1=0.0000
+RandomForest: accuracy=0.5000, precision=0.0000, recall=0.0000, f1=0.0000
+SVM_RBF: accuracy=0.5000, precision=0.0000, recall=0.0000, f1=0.0000
+MultinomialNB: accuracy=0.5000, precision=0.0000, recall=0.0000, f1=0.0000
+Best model by accuracy: LogisticRegression (accuracy=0.5000)
+
+=== Training run at 2026-02-25 08:52:04 UTC ===
+LogisticRegression: accuracy=0.9283, precision=0.9313, recall=0.8893, f1=0.9098
+RandomForest: accuracy=0.9527, precision=0.9556, recall=0.9268, f1=0.9410
+MultinomialNB: accuracy=0.8593, precision=0.9080, recall=0.7280, f1=0.8081
+Best model by accuracy: RandomForest (accuracy=0.9527)

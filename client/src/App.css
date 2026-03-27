@@ -1,0 +1,17 @@
+body { font-family: Arial, Helvetica, sans-serif; background:#f2f4f7; }
+.container { max-width: 1100px; margin: 24px auto; padding: 20px; }
+h1 { margin-bottom: 12px; }
+.layout { display:flex; gap:20px; }
+.pane { flex:1; background:#fff; padding:16px; border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.scan-form label { display:block; margin-top:8px; font-weight:600; }
+.scan-form textarea { width:100%; }
+.scan-form select { width:100%; padding:6px; }
+.row { margin-top:12px; display:flex; gap:8px; }
+button { padding:8px 12px; cursor:pointer; }
+.muted { background:#eee; }
+.error { color:#b00020; margin-top:8px; }
+.placeholder { color:#666; }
+.result-view h2 { margin-top:0; }
+.kv { display:flex; gap:8px; margin:6px 0; }
+.section { margin-top:12px; }
+.meta, .full { max-height:240px; overflow:auto; background:#f7f7f7; padding:8px; border-radius:6px; }
