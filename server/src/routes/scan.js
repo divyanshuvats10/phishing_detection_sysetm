@@ -2,20 +2,44 @@ const express = require('express');
 const router = express.Router();
 const ScanLog = require('../models/ScanLog');
 const fetch = require('node-fetch');
-const { checkVirusTotal, checkHIBP } = require('../services/threatIntel');
+const { checkVirusTotal, checkHIBP, decodeBase64Attachment, enrichVirusTotalResult } = require('../services/threatIntel');
+const { validateVtFileUpload } = require('../constants/vtUploadAllowlist');
 
 // Basic endpoint to accept scan requests, call ML microservice when configured, and store a log
 router.post('/', async (req, res) => {
   try {
-    const { inputType = 'url', raw = '', userId = null } = req.body;
+    const {
+      inputType = 'url',
+      raw = '',
+      userId = null,
+      fileName = '',
+      fileMime = ''
+    } = req.body;
+
+    if (inputType === 'attachment') {
+      const buf = decodeBase64Attachment(raw);
+      if (!buf) {
+        return res.status(400).json({
+          ok: false,
+          error: 'Invalid or empty file. Choose a file using the upload control.'
+        });
+      }
+      const vtType = validateVtFileUpload(fileName, buf.length, fileMime);
+      if (!vtType.ok) {
+        return res.status(400).json({ ok: false, error: vtType.error });
+      }
+    }
 
     let result = 'unknown';
     let score = 0;
     const meta = { notes: 'Initial placeholder' };
 
-    if (process.env.ML_SERVICE_URL) {
+    const mlBase = process.env.ML_SERVICE_URL && process.env.ML_SERVICE_URL.replace(/\/$/, '');
+    const useMlForEmail = Boolean(mlBase && inputType === 'email');
+
+    if (useMlForEmail) {
       try {
-        const mlRes = await fetch(process.env.ML_SERVICE_URL.replace(/\/$/, '') + '/analyze', {
+        const mlRes = await fetch(`${mlBase}/analyze`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ inputType, raw })
@@ -31,26 +55,50 @@ router.post('/', async (req, res) => {
         meta.mlError = mlErr.message;
       }
     } else {
-      meta.notes = 'No ML_SERVICE_URL configured; using local heuristic';
-      // simple heuristic fallback
-      const lowered = (raw || '').toLowerCase();
-      if (lowered.includes('login') || lowered.includes('verify') || lowered.includes('account') || lowered.includes('password') || lowered.includes('confirm')) {
-        result = 'phishing';
-        score = 75;
-      } else if (lowered.includes('http') || lowered.includes('https')) {
+      if (inputType === 'attachment') {
+        meta.notes =
+          'ML runs for email text only; attachments use VirusTotal (if configured) and stored metadata.';
         result = 'unknown';
-        score = 40;
+        score = 0;
       } else {
-        result = 'legitimate';
-        score = 10;
+        meta.notes = mlBase
+          ? 'ML runs for email only; using local heuristic for URL/email text.'
+          : 'No ML_SERVICE_URL configured; using local heuristic';
+        const lowered = (raw || '').toLowerCase();
+        if (lowered.includes('login') || lowered.includes('verify') || lowered.includes('account') || lowered.includes('password') || lowered.includes('confirm')) {
+          result = 'phishing';
+          score = 75;
+        } else if (lowered.includes('http') || lowered.includes('https')) {
+          result = 'unknown';
+          score = 40;
+        } else {
+          result = 'legitimate';
+          score = 10;
+        }
       }
     }
 
-    // Threat intelligence integrations (placeholders)
     try {
-      if (inputType === 'url' && process.env.VIRUSTOTAL_KEY) {
-        const vt = await checkVirusTotal(raw, process.env.VIRUSTOTAL_KEY);
+      const vtKey = process.env.VIRUSTOTAL_KEY && String(process.env.VIRUSTOTAL_KEY).trim();
+      if ((inputType === 'url' || inputType === 'attachment') && vtKey) {
+        const vt = await checkVirusTotal(inputType, raw, vtKey, {
+          fileName: inputType === 'attachment' ? fileName : undefined
+        });
         meta.virusTotal = vt;
+        if (vt.ok && vt.stats) {
+          if (vt.stats.malicious > 0) {
+            score = Math.max(score, 85);
+            if (result === 'legitimate') result = 'unknown';
+          } else if (vt.stats.suspicious > 2) {
+            score = Math.max(score, 55);
+          }
+        }
+      } else if (inputType === 'url' || inputType === 'attachment') {
+        meta.virusTotal = enrichVirusTotalResult({
+          ok: false,
+          reason: 'no_api_key',
+          hint: 'Set VIRUSTOTAL_KEY in server/.env and restart the Node server'
+        });
       }
 
       if (inputType === 'email' && process.env.HIBP_API_KEY) {

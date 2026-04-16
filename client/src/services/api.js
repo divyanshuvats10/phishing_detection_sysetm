@@ -4,9 +4,15 @@ export async function postScan(payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || 'Request failed');
+  const text = await res.text();
+  let data = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = {};
   }
-  return res.json();
+  if (!res.ok) {
+    throw new Error(data.error || text || 'Request failed');
+  }
+  return data;
 }
