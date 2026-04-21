@@ -48,3 +48,8 @@ HIBP_API_KEY=<your_hibp_api_key>
 ```
 
 When set, the backend will attach the raw API responses under the `meta` field of `ScanLog` (see `server/src/services/threatIntel.js`). These are placeholders — you should implement rate-limiting, error handling, caching, and privacy controls before production use.
+
+
+
+py -m venv venv
+>> venv\Scripts\activate
