@@ -3,12 +3,13 @@ import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-do
 import ScanForm from './components/ScanForm';
 import ResultView from './components/ResultView';
 import LogsPage from './components/LogsPage';
+import AwarenessPage from './components/AwarenessPage';
 import './App.css';
 
 function AppContent() {
   const [result, setResult] = useState(null);
   const location = useLocation();
-  const isLogs = location.pathname === '/logs';
+  const path = location.pathname;
 
   return (
     <div className="app">
@@ -51,9 +52,11 @@ function AppContent() {
 
           <div className="header-right">
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-              <Link to={isLogs ? "/" : "/logs"} className="btn-clear" style={{ textDecoration: 'none' }}>
-                {isLogs ? "// SCANNER" : "// VIEW LOGS"}
-              </Link>
+              <nav className="header-nav" style={{ display: 'flex', gap: '12px' }}>
+                <Link to="/" className={`nav-link ${path === '/' ? 'active' : ''}`}>// SCANNER</Link>
+                <Link to="/logs" className={`nav-link ${path === '/logs' ? 'active' : ''}`}>// LOGS</Link>
+                <Link to="/awareness" className={`nav-link ${path === '/awareness' ? 'active' : ''}`}>// AWARENESS</Link>
+              </nav>
               <div className="status-dot">
                 <span className="dot" aria-hidden />
                 ONLINE
@@ -94,6 +97,7 @@ function AppContent() {
             </div>
           } />
           <Route path="/logs" element={<LogsPage />} />
+          <Route path="/awareness" element={<AwarenessPage />} />
         </Routes>
       </main>
 
