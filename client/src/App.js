@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import ScanForm from './components/ScanForm';
 import ResultView from './components/ResultView';
+import LogsPage from './components/LogsPage';
 import './App.css';
 
-export default function App() {
+function AppContent() {
   const [result, setResult] = useState(null);
+  const location = useLocation();
+  const isLogs = location.pathname === '/logs';
 
   return (
     <div className="app">
@@ -16,7 +20,7 @@ export default function App() {
         <div className="app-header__inner">
 
           <div className="header-left">
-            <div className="app-logo" aria-hidden>
+            <Link to="/" className="app-logo" aria-hidden style={{ textDecoration: 'none' }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"
@@ -32,7 +36,7 @@ export default function App() {
                   strokeLinejoin="round"
                 />
               </svg>
-            </div>
+            </Link>
 
             <div className="header-text">
               <div className="sys-label">// sys::threat-analysis v2.4.1</div>
@@ -46,9 +50,14 @@ export default function App() {
           </div>
 
           <div className="header-right">
-            <div className="status-dot">
-              <span className="dot" aria-hidden />
-              ONLINE
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+              <Link to={isLogs ? "/" : "/logs"} className="btn-clear" style={{ textDecoration: 'none' }}>
+                {isLogs ? "// SCANNER" : "// VIEW LOGS"}
+              </Link>
+              <div className="status-dot">
+                <span className="dot" aria-hidden />
+                ONLINE
+              </div>
             </div>
           </div>
 
@@ -56,35 +65,46 @@ export default function App() {
       </header>
 
       <main className="container">
-        <div className="layout">
+        <Routes>
+          <Route path="/" element={
+            <div className="layout">
+              <div className="pane">
+                <div className="panel-bar">
+                  <span className="panel-title">// new_scan</span>
+                  <div className="window-dots" aria-hidden>
+                    <span /><span /><span />
+                  </div>
+                </div>
+                <div className="panel-body">
+                  <ScanForm onResult={(r) => setResult(r)} />
+                </div>
+              </div>
 
-          <div className="pane">
-            <div className="panel-bar">
-              <span className="panel-title">// new_scan</span>
-              <div className="window-dots" aria-hidden>
-                <span /><span /><span />
+              <div className="pane">
+                <div className="panel-bar">
+                  <span className="panel-title">// analysis_output</span>
+                  <div className="window-dots" aria-hidden>
+                    <span /><span /><span />
+                  </div>
+                </div>
+                <div className="panel-body">
+                  <ResultView result={result} />
+                </div>
               </div>
             </div>
-            <div className="panel-body">
-              <ScanForm onResult={(r) => setResult(r)} />
-            </div>
-          </div>
-
-          <div className="pane">
-            <div className="panel-bar">
-              <span className="panel-title">// analysis_output</span>
-              <div className="window-dots" aria-hidden>
-                <span /><span /><span />
-              </div>
-            </div>
-            <div className="panel-body">
-              <ResultView result={result} />
-            </div>
-          </div>
-
-        </div>
+          } />
+          <Route path="/logs" element={<LogsPage />} />
+        </Routes>
       </main>
 
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }

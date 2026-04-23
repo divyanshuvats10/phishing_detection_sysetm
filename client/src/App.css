@@ -996,3 +996,86 @@ details[open] .raw-summary::after {
 /* Idle state variant delays */
 .idle-cell.lit.c2 { animation-delay: 0.9s; }
 .idle-cell.lit.c3 { animation-delay: 1.7s; }
+
+
+/* P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%
+   LOGS PAGE
+   P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P%P% */
+.logs-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-family: var(--mono);
+}
+
+.logs-table th {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.logs-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.logs-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.logs-table tr:last-child td {
+  border-bottom: none;
+}
+
+.log-target {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.log-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.log-badge.log-phishing {
+  color: var(--red);
+  background: rgba(255, 77, 77, 0.08);
+  border-color: rgba(255, 77, 77, 0.3);
+}
+
+.log-badge.log-legitimate {
+  color: var(--green);
+  background: rgba(0, 255, 136, 0.08);
+  border-color: rgba(0, 255, 136, 0.3);
+}
+
+.log-badge.log-unknown {
+  color: var(--text2);
+  background: var(--bg3);
+  border-color: var(--border);
+}
+
+.text-safe { color: var(--green); }
+.text-warn { color: var(--amber); }
+.text-danger { color: var(--red); }
+

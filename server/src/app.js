@@ -9,5 +9,6 @@ const jsonLimitMb = Math.ceil((MAX_VT_UPLOAD_BYTES * 4) / 3 / (1024 * 1024)) + 5
 app.use(express.json({ limit: `${jsonLimitMb}mb` }));
 
 app.use('/api/scan', require('./routes/scan'));
+app.use('/api/logs', require('./routes/logs'));
 
 module.exports = app;
