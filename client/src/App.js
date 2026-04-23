@@ -4,6 +4,7 @@ import ScanForm from './components/ScanForm';
 import ResultView from './components/ResultView';
 import LogsPage from './components/LogsPage';
 import AwarenessPage from './components/AwarenessPage';
+import GamePage from './components/GamePage';
 import './App.css';
 
 function AppContent() {
@@ -56,6 +57,7 @@ function AppContent() {
                 <Link to="/" className={`nav-link ${path === '/' ? 'active' : ''}`}>// SCANNER</Link>
                 <Link to="/logs" className={`nav-link ${path === '/logs' ? 'active' : ''}`}>// LOGS</Link>
                 <Link to="/awareness" className={`nav-link ${path === '/awareness' ? 'active' : ''}`}>// AWARENESS</Link>
+                <Link to="/training" className={`nav-link ${path === '/training' ? 'active' : ''}`}>// TRAINING</Link>
               </nav>
               <div className="status-dot">
                 <span className="dot" aria-hidden />
@@ -98,6 +100,7 @@ function AppContent() {
           } />
           <Route path="/logs" element={<LogsPage />} />
           <Route path="/awareness" element={<AwarenessPage />} />
+          <Route path="/training" element={<GamePage />} />
         </Routes>
       </main>
 
