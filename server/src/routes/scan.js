@@ -35,9 +35,9 @@ router.post('/', async (req, res) => {
     const meta = { notes: 'Initial placeholder' };
 
     const mlBase = process.env.ML_SERVICE_URL && process.env.ML_SERVICE_URL.replace(/\/$/, '');
-    const useMlForEmail = Boolean(mlBase && inputType === 'email');
+    const useMlForInput = Boolean(mlBase && (inputType === 'email' || inputType === 'url'));
 
-    if (useMlForEmail) {
+    if (useMlForInput) {
       try {
         const mlRes = await fetch(`${mlBase}/analyze`, {
           method: 'POST',
@@ -57,12 +57,12 @@ router.post('/', async (req, res) => {
     } else {
       if (inputType === 'attachment') {
         meta.notes =
-          'ML runs for email text only; attachments use VirusTotal (if configured) and stored metadata.';
+          'ML runs for email and URL only; attachments use VirusTotal (if configured) and stored metadata.';
         result = 'unknown';
         score = 0;
       } else {
         meta.notes = mlBase
-          ? 'ML runs for email only; using local heuristic for URL/email text.'
+          ? 'ML runs for email and URL only; using local heuristic for text.'
           : 'No ML_SERVICE_URL configured; using local heuristic';
         const lowered = (raw || '').toLowerCase();
         if (lowered.includes('login') || lowered.includes('verify') || lowered.includes('account') || lowered.includes('password') || lowered.includes('confirm')) {

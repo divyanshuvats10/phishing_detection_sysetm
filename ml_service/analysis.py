@@ -7,6 +7,30 @@ _model = None
 _vectorizer = None
 MODEL_DIR = os.path.join(os.path.dirname(__file__), 'models')
 
+_url_model = None
+_url_vectorizer = None
+URL_MODEL_DIR = os.path.join(os.path.dirname(__file__), 'models_url')
+
+def load_url_model():
+    """Load trained URL model and vectorizer if they exist; otherwise None"""
+    global _url_model, _url_vectorizer
+    if _url_model is not None and _url_vectorizer is not None:
+        return _url_model, _url_vectorizer
+    
+    model_path = os.path.join(URL_MODEL_DIR, 'url_model.joblib')
+    vectorizer_path = os.path.join(URL_MODEL_DIR, 'url_vectorizer.joblib')
+    
+    if os.path.exists(model_path) and os.path.exists(vectorizer_path):
+        try:
+            _url_model = joblib.load(model_path)
+            _url_vectorizer = joblib.load(vectorizer_path)
+            print(f"[ML] Loaded URL model from {URL_MODEL_DIR}")
+            return _url_model, _url_vectorizer
+        except Exception as e:
+            print(f"[ML] Failed to load URL model: {e}")
+    
+    return None, None
+
 
 def load_model():
     """Load trained model and vectorizer if they exist; otherwise None"""
@@ -46,7 +70,11 @@ def simple_analyze(input_type, raw):
     text = (raw or '').lower().strip()
     
     # Try to use trained model first
-    model, vectorizer = load_model()
+    if input_type == 'url':
+        model, vectorizer = load_url_model()
+    else:
+        model, vectorizer = load_model()
+        
     if model and vectorizer:
         try:
             vec = vectorizer.transform([text])

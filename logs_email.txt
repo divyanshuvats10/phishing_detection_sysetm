@@ -1,0 +1,69 @@
+
+
+Training LogisticRegression...
+--- LogisticRegression Evaluation ---
+Accuracy:  0.9283
+Precision: 0.9313
+Recall:    0.8893
+F1 Score:  0.9098
+Confusion Matrix:
+[[16500   777]
+ [ 1312 10539]]
+
+Training RandomForest...
+--- RandomForest Evaluation ---
+Accuracy:  0.9527
+Precision: 0.9556
+Recall:    0.9268
+F1 Score:  0.9410
+Confusion Matrix:
+[[16767   510]
+ [  867 10984]]
+
+Training MultinomialNB...
+--- MultinomialNB Evaluation ---
+Accuracy:  0.8593
+Precision: 0.9080
+Recall:    0.7280
+F1 Score:  0.8081
+Confusion Matrix:
+[[16403   874]
+ [ 3223  8628]]
+
+
+467e870146b58718825d591a6d62daa4a050a5babff3a63cf6451c2d2926a4d9
+
+
+
+ml url
+
+
+Training LogisticRegression...
+--- LogisticRegression Evaluation ---
+Accuracy:  0.9967
+Precision: 0.9943
+Recall:    1.0000
+F1 Score:  0.9971
+Confusion Matrix:
+[[20034   155]
+ [    0 26970]]
+
+Training RandomForest...
+--- RandomForest Evaluation ---
+Accuracy:  0.9974
+Precision: 0.9960
+Recall:    0.9994
+F1 Score:  0.9977
+Confusion Matrix:
+[[20081   108]
+ [   15 26955]]
+
+Training MultinomialNB...
+--- MultinomialNB Evaluation ---
+Accuracy:  0.9867
+Precision: 0.9824
+Recall:    0.9947
+F1 Score:  0.9885
+Confusion Matrix:
+[[19708   481]
+ [  144 26826]]
