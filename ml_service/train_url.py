@@ -48,7 +48,14 @@ def load_url_data(csv_path):
         raise ValueError("Dataset must have 'URL' and 'label' columns.")
     
     # We only need the URL string and the label
-    return df[['URL', 'label']].copy()
+    df_subset = df[['URL', 'label']].copy()
+    
+    # In the PhiUSIIL dataset, 1 = Legitimate and 0 = Phishing.
+    # Our application expects 1 = Phishing and 0 = Legitimate.
+    # So we invert the labels here!
+    df_subset['label'] = 1 - df_subset['label']
+    
+    return df_subset
 
 
 def _evaluate_model(name, model, X_train, X_test, y_train, y_test):

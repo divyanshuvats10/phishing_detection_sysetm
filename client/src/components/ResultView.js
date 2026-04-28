@@ -109,6 +109,7 @@ export default function ResultView({ result }) {
 
   const log   = result.log || {};
   const vt    = log.meta && log.meta.virusTotal;
+  const ml    = log.meta && log.meta.ml;
   const level = verdictLevel(log.result);
   const score = log.riskScore;
   const sLvl  = scoreLevel(score);
@@ -142,6 +143,41 @@ export default function ResultView({ result }) {
           </div>
         </div>
       </div>
+
+      {/* ── ML Model block ── */}
+      {ml && (
+        <div className="vt-block" style={{ marginBottom: '1.5rem' }}>
+          <div className="section-header">
+            <span className="section-title">// local ml analysis</span>
+          </div>
+
+          <div className="vt-verdict-row">
+            <span className={`verdict-chip ${verdictLevel(ml.classification)}`}>
+              {ml.classification === 'phishing' ? 'Phishing' : ml.classification === 'unknown' ? 'Suspicious' : 'Clean'}
+            </span>
+            <span className="vt-short-msg">
+              {ml.explain?.method === 'trained_model' 
+                ? `Model is ${Math.max(ml.explain.phishing_probability || 0, ml.explain.legitimate_probability || 0)}% confident.` 
+                : ml.explain?.method === 'allowlist'
+                ? ml.explain.message
+                : 'Rule-based heuristic analysis.'}
+            </span>
+          </div>
+          
+          {ml.explain?.method === 'trained_model' && (
+            <div className="vt-stats-grid" style={{ marginTop: '0.75rem' }}>
+              <div className={`vt-stat ${ml.explain.phishing_probability > 50 ? 'bad' : 'neutral'}`}>
+                <span className="vt-stat-val">{ml.explain.phishing_probability}%</span>
+                <span className="vt-stat-lbl">phish prob.</span>
+              </div>
+              <div className={`vt-stat ${ml.explain.legitimate_probability > 50 ? 'safe' : 'neutral'}`}>
+                <span className="vt-stat-val">{ml.explain.legitimate_probability}%</span>
+                <span className="vt-stat-lbl">clean prob.</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── VirusTotal block ── */}
       {vt && (

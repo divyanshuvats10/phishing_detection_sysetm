@@ -1,6 +1,7 @@
 import re
 import os
 import joblib
+from urllib.parse import urlparse
 
 # Global model and vectorizer (lazy-loaded on first use)
 _model = None
@@ -69,7 +70,35 @@ def simple_analyze(input_type, raw):
     """
     text = (raw or '').lower().strip()
     
-    # Try to use trained model first
+    # 1. Quick Allowlist Check for URLs
+    if input_type == 'url':
+        try:
+            # urlparse needs a scheme to properly parse the netloc
+            parse_url = text if text.startswith('http') else 'http://' + text
+            domain = urlparse(parse_url).netloc.split(':')[0]
+            if domain.startswith('www.'):
+                domain = domain[4:]
+                
+            allowlist = {
+                'google.com', 'facebook.com', 'youtube.com', 'github.com', 
+                'amazon.com', 'twitter.com', 'linkedin.com', 'instagram.com',
+                'microsoft.com', 'apple.com', 'netflix.com', 'wikipedia.org',
+                'yahoo.com', 'reddit.com', 'bing.com', 'whatsapp.com'
+            }
+            
+            if domain in allowlist:
+                return {
+                    'classification': 'legitimate',
+                    'score': 0,
+                    'explain': {
+                        'method': 'allowlist',
+                        'message': f'Domain {domain} is explicitly trusted.'
+                    }
+                }
+        except Exception:
+            pass
+    
+    # 2. Try to use trained model first
     if input_type == 'url':
         model, vectorizer = load_url_model()
     else:
