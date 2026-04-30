@@ -43,7 +43,7 @@ function AppContent() {
             <div className="header-text">
               <div className="sys-label">// sys::threat-analysis v2.4.1</div>
               <h1 className="header-title">
-                <span className="title-accent">PHISH</span>GUARD
+                <span className="title-accent">PHISH</span>CEASE
               </h1>
               <p className="tagline">
                 ml-powered phishing detection · url · email · attachment
