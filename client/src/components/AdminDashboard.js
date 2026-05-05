@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { API_BASE } from '../config';
 
 export default function AdminDashboard() {
   const { token, user } = useContext(AuthContext);
@@ -25,7 +26,7 @@ export default function AdminDashboard() {
   const fetchLogs = async (page = 1) => {
     setLoadingLogs(true);
     try {
-      const res = await fetch(`/api/admin/logs?page=${page}&limit=20`, {
+      const res = await fetch(`${API_BASE}/api/admin/logs?page=${page}&limit=20`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -45,7 +46,7 @@ export default function AdminDashboard() {
   const fetchUsers = async (page = 1) => {
     setLoadingUsers(true);
     try {
-      const res = await fetch(`/api/admin/users?page=${page}&limit=20`, {
+      const res = await fetch(`${API_BASE}/api/admin/users?page=${page}&limit=20`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -72,7 +73,7 @@ export default function AdminDashboard() {
   const deleteLog = async (id) => {
     if (!window.confirm('Delete this log permanently?')) return;
     try {
-      const res = await fetch(`/api/admin/logs/${id}`, {
+      const res = await fetch(`${API_BASE}/api/admin/logs/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -90,7 +91,7 @@ export default function AdminDashboard() {
   const deleteUser = async (id) => {
     if (!window.confirm('Delete this user permanently?')) return;
     try {
-      const res = await fetch(`/api/admin/users/${id}`, {
+      const res = await fetch(`${API_BASE}/api/admin/users/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { API_BASE } from '../config';
 
 export default function LogsPage() {
   const [logs, setLogs] = useState([]);
@@ -16,7 +17,7 @@ export default function LogsPage() {
     const headers = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
     
-    let url = '/api/logs';
+    let url = `${API_BASE}/api/logs`;
     if (!token && guestSessionId) {
       url += `?guestSessionId=${guestSessionId}`;
     }
