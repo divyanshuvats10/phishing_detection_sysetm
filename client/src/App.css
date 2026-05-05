@@ -1079,3 +1079,65 @@ details[open] .raw-summary::after {
 .text-warn { color: var(--amber); }
 .text-danger { color: var(--red); }
 
+/* ════════════════════════════════════════════
+   AUTH FORMS
+   ════════════════════════════════════════════ */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+
+.input-field {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 12px 16px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input-field:focus {
+  border-color: var(--green3);
+  box-shadow: inset 0 0 0 1px var(--green3);
+}
+
+.action-btn {
+  background: var(--green);
+  color: #000;
+  border: none;
+  padding: 14px 20px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.action-btn:hover {
+  background: #00ffaa;
+}
+
+.action-btn:active {
+  transform: scale(0.99);
+}

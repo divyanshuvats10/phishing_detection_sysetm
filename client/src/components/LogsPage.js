@@ -1,12 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 export default function LogsPage() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { token, guestSessionId } = useContext(AuthContext);
 
   useEffect(() => {
-    fetch('/api/logs')
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    let url = '/api/logs';
+    if (!token && guestSessionId) {
+      url += `?guestSessionId=${guestSessionId}`;
+    }
+
+    fetch(url, { headers })
       .then(res => res.json())
       .then(data => {
         if (data.ok) {

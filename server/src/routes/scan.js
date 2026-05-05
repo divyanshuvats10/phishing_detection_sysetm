@@ -5,16 +5,19 @@ const fetch = require('node-fetch');
 const { checkVirusTotal, checkHIBP, decodeBase64Attachment, enrichVirusTotalResult } = require('../services/threatIntel');
 const { validateVtFileUpload } = require('../constants/vtUploadAllowlist');
 
+const { optionalAuth } = require('../middleware/authMiddleware');
+
 // Basic endpoint to accept scan requests, call ML microservice when configured, and store a log
-router.post('/', async (req, res) => {
+router.post('/', optionalAuth, async (req, res) => {
   try {
     const {
       inputType = 'url',
       raw = '',
-      userId = null,
+      guestSessionId = null,
       fileName = '',
       fileMime = ''
     } = req.body;
+    const userId = req.userId || null;
 
     if (inputType === 'attachment') {
       const buf = decodeBase64Attachment(raw);
@@ -111,6 +114,7 @@ router.post('/', async (req, res) => {
 
     const log = new ScanLog({
       user: userId,
+      guestSessionId: !userId ? guestSessionId : null,
       inputType,
       raw,
       result,

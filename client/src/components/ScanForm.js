@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import { postScan } from '../services/api';
 import { validateVtFileUpload, vtAcceptAttribute } from '../constants/vtUploadAllowlist';
 
@@ -24,6 +25,7 @@ export default function ScanForm({ onResult }) {
   const [loading, setLoading]           = useState(false);
   const [error, setError]               = useState(null);
   const fileInputRef                    = useRef(null);
+  const { token, guestSessionId }       = useContext(AuthContext);
 
   useEffect(() => {
     if (inputType !== 'attachment') {
@@ -75,10 +77,11 @@ export default function ScanForm({ onResult }) {
           raw: dataUrl,
           fileName: attachmentFile.name,
           fileMime: attachmentFile.type || '',
-        });
+          guestSessionId
+        }, token);
         onResult(res);
       } else {
-        const res = await postScan({ inputType, raw });
+        const res = await postScan({ inputType, raw, guestSessionId }, token);
         onResult(res);
       }
     } catch (err) {

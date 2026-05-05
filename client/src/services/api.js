@@ -1,7 +1,11 @@
-export async function postScan(payload) {
+export async function postScan(payload, token) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   const res = await fetch('/api/scan', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(payload)
   });
   const text = await res.text();

@@ -2,10 +2,24 @@ const express = require('express');
 const router = express.Router();
 const ScanLog = require('../models/ScanLog');
 
+const { optionalAuth } = require('../middleware/authMiddleware');
+
 // Fetch recent scan logs, sorted by newest first
-router.get('/', async (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
   try {
-    const logs = await ScanLog.find()
+    const { guestSessionId } = req.query;
+    let query = {};
+    if (req.userId) {
+      query.user = req.userId;
+    } else if (guestSessionId) {
+      query.guestSessionId = guestSessionId;
+    } else {
+      // If no user and no guestSessionId, return empty or something?
+      // Let's just return what they asked for, or maybe return empty array to be safe
+      return res.json({ ok: true, logs: [] });
+    }
+
+    const logs = await ScanLog.find(query)
       .sort({ createdAt: -1 })
       .limit(50); // Limit to last 50 for performance
     

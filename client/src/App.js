@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import ScanForm from './components/ScanForm';
 import ResultView from './components/ResultView';
 import LogsPage from './components/LogsPage';
 import AwarenessPage from './components/AwarenessPage';
 import GamePage from './components/GamePage';
+import LoginPage from './components/LoginPage';
+import RegisterPage from './components/RegisterPage';
+import { AuthProvider, AuthContext } from './context/AuthContext';
 import './App.css';
 
 function AppContent() {
   const [result, setResult] = useState(null);
   const location = useLocation();
   const path = location.pathname;
+  const navigate = useNavigate();
+  const { user, logout } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="app">
@@ -53,11 +63,23 @@ function AppContent() {
 
           <div className="header-right">
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-              <nav className="header-nav" style={{ display: 'flex', gap: '12px' }}>
+              <nav className="header-nav" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <Link to="/" className={`nav-link ${path === '/' ? 'active' : ''}`}>// SCANNER</Link>
                 <Link to="/logs" className={`nav-link ${path === '/logs' ? 'active' : ''}`}>// LOGS</Link>
                 <Link to="/awareness" className={`nav-link ${path === '/awareness' ? 'active' : ''}`}>// AWARENESS</Link>
                 <Link to="/training" className={`nav-link ${path === '/training' ? 'active' : ''}`}>// TRAINING</Link>
+                <div className="nav-divider" style={{ width: '1px', height: '20px', background: 'var(--border)', margin: '0 8px' }}></div>
+                {user ? (
+                  <>
+                    <span style={{ color: 'var(--text2)', fontSize: '13px', textTransform: 'uppercase' }}>OP: {user.name}</span>
+                    <button className="nav-link" onClick={handleLogout} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>// LOGOUT</button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className={`nav-link ${path === '/login' ? 'active' : ''}`}>// LOGIN</Link>
+                    <Link to="/register" className={`nav-link ${path === '/register' ? 'active' : ''}`}>// REGISTER</Link>
+                  </>
+                )}
               </nav>
               <div className="status-dot">
                 <span className="dot" aria-hidden />
@@ -101,6 +123,8 @@ function AppContent() {
           <Route path="/logs" element={<LogsPage />} />
           <Route path="/awareness" element={<AwarenessPage />} />
           <Route path="/training" element={<GamePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </main>
 
@@ -110,8 +134,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
