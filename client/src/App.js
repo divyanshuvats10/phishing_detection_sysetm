@@ -7,6 +7,7 @@ import AwarenessPage from './components/AwarenessPage';
 import GamePage from './components/GamePage';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
+import AdminDashboard from './components/AdminDashboard';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import './App.css';
 
@@ -72,6 +73,9 @@ function AppContent() {
                 {user ? (
                   <>
                     <span style={{ color: 'var(--text2)', fontSize: '13px', textTransform: 'uppercase' }}>OP: {user.name}</span>
+                    {user.role === 'admin' && (
+                      <Link to="/admin" className={`nav-link ${path === '/admin' ? 'active' : ''}`} style={{ color: 'var(--amber)' }}>// ADMIN</Link>
+                    )}
                     <button className="nav-link" onClick={handleLogout} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>// LOGOUT</button>
                   </>
                 ) : (
@@ -125,6 +129,7 @@ function AppContent() {
           <Route path="/training" element={<GamePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </main>
 

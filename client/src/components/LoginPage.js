@@ -31,8 +31,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="layout">
-      <div className="pane" style={{ maxWidth: '400px', margin: '0 auto' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+      <div className="pane" style={{ width: '100%', maxWidth: '400px' }}>
         <div className="panel-bar">
           <span className="panel-title">// user_auth_login</span>
           <div className="window-dots" aria-hidden>

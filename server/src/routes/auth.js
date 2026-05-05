@@ -37,13 +37,14 @@ router.post('/register', async (req, res) => {
 
     const payload = {
       user: {
-        id: user.id
+        id: user.id,
+        role: user.role
       }
     };
 
     jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' }, (err, token) => {
       if (err) throw err;
-      res.json({ ok: true, token, user: { id: user.id, name: user.name, email: user.email } });
+      res.json({ ok: true, token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
     });
   } catch (err) {
     console.error('Registration error:', err.message);
@@ -72,13 +73,14 @@ router.post('/login', async (req, res) => {
 
     const payload = {
       user: {
-        id: user.id
+        id: user.id,
+        role: user.role
       }
     };
 
     jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' }, (err, token) => {
       if (err) throw err;
-      res.json({ ok: true, token, user: { id: user.id, name: user.name, email: user.email } });
+      res.json({ ok: true, token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
     });
   } catch (err) {
     console.error('Login error:', err.message);

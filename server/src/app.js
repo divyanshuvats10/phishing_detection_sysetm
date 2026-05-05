@@ -11,5 +11,6 @@ app.use(express.json({ limit: `${jsonLimitMb}mb` }));
 app.use('/api/scan', require('./routes/scan'));
 app.use('/api/logs', require('./routes/logs'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/admin', require('./routes/admin'));
 
 module.exports = app;
