@@ -81,6 +81,14 @@ export default function ScanForm({ onResult }) {
         }, token);
         onResult(res);
       } else {
+        if (inputType === 'url') {
+          const urlPattern = /^(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)$/i;
+          if (!urlPattern.test(raw.trim())) {
+            setError('Warning: Please enter a valid URL.');
+            setLoading(false);
+            return;
+          }
+        }
         const res = await postScan({ inputType, raw, guestSessionId }, token);
         onResult(res);
       }

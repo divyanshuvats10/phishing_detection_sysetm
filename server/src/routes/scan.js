@@ -42,7 +42,7 @@ router.post('/', optionalAuth, async (req, res) => {
 
     let extractedUrls = [];
     if (inputType === 'email') {
-      const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+      const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.com[^\s]*)/gi;
       const matches = raw.match(urlRegex);
       if (matches) {
         extractedUrls = [...new Set(matches)]; // remove duplicates
@@ -50,21 +50,36 @@ router.post('/', optionalAuth, async (req, res) => {
     }
 
     if (useMlForInput) {
-      try {
-        const mlRes = await fetch(`${mlBase}/analyze`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ inputType, raw })
-        });
-        const mlJson = await mlRes.json();
-        if (mlJson) {
-          result = mlJson.classification || 'unknown';
-          score = typeof mlJson.score === 'number' ? mlJson.score : 0;
-          meta.ml = mlJson;
+      let textForMl = raw;
+      if (inputType === 'email' && extractedUrls.length > 0) {
+        textForMl = raw.replace(/(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.com[^\s]*)/gi, '').trim();
+      }
+
+      if (inputType === 'email' && textForMl.length === 0) {
+        result = 'legitimate';
+        score = 0;
+        meta.ml = {
+          classification: 'legitimate',
+          score: 0,
+          explain: { method: 'heuristic', message: 'Email text was empty after URL extraction.' }
+        };
+      } else {
+        try {
+          const mlRes = await fetch(`${mlBase}/analyze`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ inputType, raw: textForMl })
+          });
+          const mlJson = await mlRes.json();
+          if (mlJson) {
+            result = mlJson.classification || 'unknown';
+            score = typeof mlJson.score === 'number' ? mlJson.score : 0;
+            meta.ml = mlJson;
+          }
+        } catch (mlErr) {
+          console.warn('ML service call failed:', mlErr.message);
+          meta.mlError = mlErr.message;
         }
-      } catch (mlErr) {
-        console.warn('ML service call failed:', mlErr.message);
-        meta.mlError = mlErr.message;
       }
 
       if (extractedUrls.length > 0) {
