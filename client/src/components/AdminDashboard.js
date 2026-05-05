@@ -16,6 +16,11 @@ export default function AdminDashboard() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   
   const [error, setError] = useState('');
+  const [expandedLogs, setExpandedLogs] = useState({});
+
+  const toggleExpand = (id) => {
+    setExpandedLogs(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const fetchLogs = async (page = 1) => {
     setLoadingLogs(true);
@@ -164,8 +169,18 @@ export default function AdminDashboard() {
                           {log.user ? `${log.user.name} (${log.user.email})` : `Guest [${log.guestSessionId?.substring(0, 8)}]`}
                         </td>
                         <td style={{ textTransform: 'uppercase', color: 'var(--text2)' }}>{log.inputType}</td>
-                        <td className="log-target" title={log.raw}>
-                          {log.raw.length > 30 ? log.raw.substring(0, 30) + '...' : log.raw}
+                        <td 
+                          className="log-target" 
+                          title={log.raw}
+                          onClick={() => toggleExpand(log._id)}
+                          style={{ 
+                            cursor: 'pointer', 
+                            whiteSpace: expandedLogs[log._id] ? 'pre-wrap' : 'nowrap',
+                            wordBreak: expandedLogs[log._id] ? 'break-all' : 'normal',
+                            maxWidth: expandedLogs[log._id] ? 'none' : '300px'
+                          }}
+                        >
+                          {expandedLogs[log._id] || log.raw.length <= 30 ? log.raw : log.raw.substring(0, 30) + '...'}
                         </td>
                         <td>
                           <span className={`log-badge log-${log.result}`}>{log.result}</span>

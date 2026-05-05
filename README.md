@@ -1,6 +1,6 @@
 # PhishCease — Phishing Detection & Reporting System
 
-PhishGuard is a comprehensive, full-stack application designed to detect and report phishing threats in real-time. By combining a modern web interface, a robust backend API, and a dedicated Machine Learning microservice, the system analyzes URLs, emails, and SMS messages for malicious intent.
+PhishCease is a comprehensive, full-stack application designed to detect and report phishing threats in real-time. By combining a modern web interface, a robust backend API, and a dedicated Machine Learning microservice, the system analyzes URLs, emails, and SMS messages for malicious intent.
 
 ## 🚀 Features
 

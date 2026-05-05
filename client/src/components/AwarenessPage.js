@@ -159,7 +159,7 @@ function PreventionContent() {
 
       <div className="aw-alert" style={{borderColor: 'var(--green3)', background: 'rgba(0, 255, 136, 0.08)'}}>
         <strong style={{color: 'var(--green)'}}>SYSTEM ADVISORY:</strong> 
-        Always utilize the <strong>PHISHGUARD Scanner</strong> to analyze suspicious URLs, Emails, and Attachments before interacting with them. Our machine learning models and threat intelligence integrations provide an immediate risk assessment.
+        Always utilize the <strong>PHISHCEASE Scanner</strong> to analyze suspicious URLs, Emails, and Attachments before interacting with them. Our machine learning models and threat intelligence integrations provide an immediate risk assessment.
       </div>
     </div>
   );

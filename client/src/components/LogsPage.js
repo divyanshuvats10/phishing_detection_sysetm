@@ -6,6 +6,11 @@ export default function LogsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { token, guestSessionId } = useContext(AuthContext);
+  const [expandedLogs, setExpandedLogs] = useState({});
+
+  const toggleExpand = (id) => {
+    setExpandedLogs(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   useEffect(() => {
     const headers = {};
@@ -88,8 +93,18 @@ export default function LogsPage() {
                   <tr key={log._id}>
                     <td>{new Date(log.createdAt).toLocaleString()}</td>
                     <td style={{ textTransform: 'uppercase', color: 'var(--text2)' }}>{log.inputType}</td>
-                    <td className="log-target" title={log.raw}>
-                      {log.raw.length > 50 ? log.raw.substring(0, 50) + '...' : log.raw}
+                    <td 
+                      className="log-target" 
+                      title={log.raw}
+                      onClick={() => toggleExpand(log._id)}
+                      style={{ 
+                        cursor: 'pointer', 
+                        whiteSpace: expandedLogs[log._id] ? 'pre-wrap' : 'nowrap',
+                        wordBreak: expandedLogs[log._id] ? 'break-all' : 'normal',
+                        maxWidth: expandedLogs[log._id] ? 'none' : '300px'
+                      }}
+                    >
+                      {expandedLogs[log._id] || log.raw.length <= 50 ? log.raw : log.raw.substring(0, 50) + '...'}
                     </td>
                     <td>
                       <span className={`log-badge log-${log.result}`}>
