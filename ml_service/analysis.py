@@ -83,7 +83,10 @@ def simple_analyze(input_type, raw):
                 'google.com', 'facebook.com', 'youtube.com', 'github.com', 
                 'amazon.com', 'twitter.com', 'linkedin.com', 'instagram.com',
                 'microsoft.com', 'apple.com', 'netflix.com', 'wikipedia.org',
-                'yahoo.com', 'reddit.com', 'bing.com', 'whatsapp.com'
+                'yahoo.com', 'reddit.com', 'bing.com', 'whatsapp.com',
+                'spotify.com', 'twitch.tv', 'adobe.com', 'office.com',
+                'zoom.us', 'cloudflare.com', 'medium.com', 'nytimes.com',
+                'discord.com', 'slack.com', 'aws.amazon.com', 'dropbox.com'
             }
             
             if domain in allowlist:

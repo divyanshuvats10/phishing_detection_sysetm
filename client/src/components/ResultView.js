@@ -244,6 +244,35 @@ export default function ResultView({ result }) {
         </div>
       )}
 
+      {/* ── Extracted URLs block ── */}
+      {log.meta && log.meta.extractedUrls && log.meta.extractedUrls.length > 0 && (
+        <div className="vt-block">
+          <div className="section-header">
+            <span className="section-title">// extracted links</span>
+          </div>
+          {log.meta.extractedUrls.map((eu, i) => (
+            <div key={i} style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: i < log.meta.extractedUrls.length - 1 ? '1px solid var(--border)' : 'none' }}>
+              <div style={{ wordBreak: 'break-all', marginBottom: '8px', color: 'var(--text)' }}>
+                <strong>{eu.url}</strong>
+              </div>
+              <div className="vt-verdict-row" style={{ marginTop: '4px' }}>
+                <span className={`verdict-chip ${verdictLevel(eu.result)}`}>
+                  ML: {eu.result.toUpperCase()} ({eu.score}/100)
+                </span>
+              </div>
+              {eu.virusTotal && eu.virusTotal.summary && (
+                <div className="vt-verdict-row" style={{ marginTop: '8px' }}>
+                  <span className={`verdict-chip ${vtLevelClass(eu.virusTotal.summary.verdict)}`}>
+                    VT: {eu.virusTotal.summary.label}
+                  </span>
+                  <span className="vt-short-msg">{eu.virusTotal.summary.shortMessage}</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* ── Activity log ── */}
       <div className="log-block">
         <div className="log-line">

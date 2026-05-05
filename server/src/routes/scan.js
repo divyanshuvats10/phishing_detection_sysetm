@@ -40,6 +40,15 @@ router.post('/', optionalAuth, async (req, res) => {
     const mlBase = process.env.ML_SERVICE_URL && process.env.ML_SERVICE_URL.replace(/\/$/, '');
     const useMlForInput = Boolean(mlBase && (inputType === 'email' || inputType === 'url'));
 
+    let extractedUrls = [];
+    if (inputType === 'email') {
+      const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+      const matches = raw.match(urlRegex);
+      if (matches) {
+        extractedUrls = [...new Set(matches)]; // remove duplicates
+      }
+    }
+
     if (useMlForInput) {
       try {
         const mlRes = await fetch(`${mlBase}/analyze`, {
@@ -56,6 +65,27 @@ router.post('/', optionalAuth, async (req, res) => {
       } catch (mlErr) {
         console.warn('ML service call failed:', mlErr.message);
         meta.mlError = mlErr.message;
+      }
+
+      if (extractedUrls.length > 0) {
+        meta.extractedUrls = [];
+        for (const url of extractedUrls) {
+          const urlData = { url, score: 0, result: 'unknown' };
+          try {
+            const mlUrlRes = await fetch(`${mlBase}/analyze`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ inputType: 'url', raw: url })
+            });
+            const mlUrlJson = await mlUrlRes.json();
+            urlData.ml = mlUrlJson;
+            urlData.result = mlUrlJson.classification || 'unknown';
+            urlData.score = typeof mlUrlJson.score === 'number' ? mlUrlJson.score : 0;
+          } catch (e) {
+            urlData.mlError = e.message;
+          }
+          meta.extractedUrls.push(urlData);
+        }
       }
     } else {
       if (inputType === 'attachment') {
@@ -83,7 +113,9 @@ router.post('/', optionalAuth, async (req, res) => {
 
     try {
       const vtKey = process.env.VIRUSTOTAL_KEY && String(process.env.VIRUSTOTAL_KEY).trim();
-      if ((inputType === 'url' || inputType === 'attachment') && vtKey) {
+      const isMainAllowlisted = meta.ml?.explain?.method === 'allowlist';
+      
+      if ((inputType === 'url' || inputType === 'attachment') && vtKey && !isMainAllowlisted) {
         const vt = await checkVirusTotal(inputType, raw, vtKey, {
           fileName: inputType === 'attachment' ? fileName : undefined
         });
@@ -94,6 +126,36 @@ router.post('/', optionalAuth, async (req, res) => {
             if (result === 'legitimate') result = 'unknown';
           } else if (vt.stats.suspicious > 2) {
             score = Math.max(score, 55);
+          }
+        }
+      } else if (isMainAllowlisted && (inputType === 'url' || inputType === 'attachment')) {
+         meta.virusTotal = enrichVirusTotalResult({
+           ok: false,
+           reason: 'allowlist',
+           hint: 'VirusTotal check bypassed due to domain allowlist.'
+         });
+      } else if (inputType === 'email' && vtKey && meta.extractedUrls && meta.extractedUrls.length > 0) {
+        for (const urlData of meta.extractedUrls) {
+          if (urlData.ml?.explain?.method === 'allowlist') {
+            // Ignore VirusTotal for allowlisted extracted links
+            urlData.virusTotal = enrichVirusTotalResult({
+              ok: false,
+              reason: 'allowlist',
+              hint: 'VirusTotal check bypassed due to domain allowlist.'
+            });
+            continue;
+          }
+          
+          const vt = await checkVirusTotal('url', urlData.url, vtKey);
+          urlData.virusTotal = vt;
+          if (vt.ok && vt.stats) {
+            if (vt.stats.malicious > 0) {
+              urlData.score = Math.max(urlData.score, 85);
+              if (urlData.result === 'legitimate') urlData.result = 'unknown';
+              urlData.result = 'phishing';
+            } else if (vt.stats.suspicious > 2) {
+              urlData.score = Math.max(urlData.score, 55);
+            }
           }
         }
       } else if (inputType === 'url' || inputType === 'attachment') {
@@ -108,6 +170,19 @@ router.post('/', optionalAuth, async (req, res) => {
         const hibp = await checkHIBP(raw, process.env.HIBP_API_KEY);
         meta.hibp = hibp;
       }
+      
+      // Update overall score if extracted URLs are more malicious
+      if (inputType === 'email' && meta.extractedUrls) {
+        for (const urlData of meta.extractedUrls) {
+          if (urlData.score > score) {
+            score = urlData.score;
+          }
+          if (urlData.result === 'phishing' || urlData.score >= 50) {
+            result = 'phishing';
+          }
+        }
+      }
+
     } catch (intelErr) {
       console.warn('Threat intel check failed:', intelErr.message || intelErr);
     }
