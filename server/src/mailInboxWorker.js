@@ -207,18 +207,88 @@ async function getGoogleAccessToken() {
   return data.access_token;
 }
 
+function buildHtmlEmail(body) {
+  if (!body.ok) {
+    return `<div style="font-family: sans-serif; padding: 20px;"><h2>Scan Failed</h2><p>${body.error || 'Unknown error occurred.'}</p></div>`;
+  }
+
+  const riskScore = body.riskScore ?? 0;
+  const isMalicious = riskScore >= 50;
+  const color = isMalicious ? '#e53e3e' : '#38a169';
+  const statusText = isMalicious ? 'High Risk / Malicious' : 'Safe / Clean';
+
+  let html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      <div style="background-color: ${color}; color: white; padding: 25px; text-align: center;">
+        <h1 style="margin: 0; font-size: 26px;">PhishCease Report</h1>
+        <p style="margin: 8px 0 0; font-size: 18px; opacity: 0.9;">Assessment: <strong>${statusText}</strong></p>
+      </div>
+      
+      <div style="padding: 30px;">
+        <div style="text-align: center; margin-bottom: 30px; background-color: #f7fafc; padding: 20px; border-radius: 8px;">
+          <div style="font-size: 54px; font-weight: 800; color: ${color}; line-height: 1;">${riskScore}<span style="font-size: 24px; color: #a0aec0; font-weight: normal;">/100</span></div>
+          <div style="color: #4a5568; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; font-weight: bold;">Overall Threat Score</div>
+        </div>
+
+        <h3 style="border-bottom: 2px solid #edf2f7; padding-bottom: 8px; color: #2d3748; font-size: 18px;">Email Content Analysis</h3>
+        <ul style="color: #4a5568; line-height: 1.8; font-size: 15px;">
+  `;
+
+  if (body.results) {
+    const ml = body.results.ml_confidence;
+    const clf = body.results.classification;
+    if (clf) {
+       html += `<li><strong>Classification:</strong> <span style="color: #2d3748;">${clf.toUpperCase()}</span></li>`;
+    }
+    if (ml !== undefined) {
+       html += `<li><strong>ML Confidence:</strong> ${(ml * 100).toFixed(1)}%</li>`;
+    }
+  }
+
+  html += `</ul>`;
+
+  if (body.results && body.results.extracted_urls && body.results.extracted_urls.length > 0) {
+    html += `<h3 style="border-bottom: 2px solid #edf2f7; padding-bottom: 8px; color: #2d3748; margin-top: 30px; font-size: 18px;">Extracted Links Analysis</h3>`;
+    body.results.extracted_urls.forEach((u) => {
+      const uScore = u.riskScore ?? 0;
+      const uColor = uScore >= 50 ? '#e53e3e' : '#38a169';
+      html += `
+        <div style="background-color: #fff; border: 1px solid #e2e8f0; border-left: 5px solid ${uColor}; padding: 15px; margin-bottom: 12px; border-radius: 6px;">
+          <div style="font-family: 'Courier New', monospace; word-break: break-all; color: #2b6cb0; margin-bottom: 8px; font-size: 14px; background: #f7fafc; padding: 5px; border-radius: 4px;">${u.url}</div>
+          <div style="font-size: 15px; color: #4a5568; display: flex; justify-content: space-between;">
+            <span>Threat Score:</span>
+            <strong style="color: ${uColor}; font-size: 16px;">${uScore}/100</strong>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  html += `
+        <div style="margin-top: 40px; font-size: 12px; color: #a0aec0; text-align: center; border-top: 1px solid #edf2f7; padding-top: 20px;">
+          <p style="margin: 0;">Automated scan performed by <strong>PhishCease</strong>.</p>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  return html;
+}
+
 async function sendResultEmail(transporter, to, subject, payloadJson) {
   const user = inboxUser();
   const body = scanJsonForEmailReply(payloadJson);
-  const emailSubject = `[PhishingScan Result] Re: ${subject || '(no subject)'}`;
+  const emailSubject = `[PhishCease Report] Re: ${subject || '(no subject)'}`;
+  const htmlContent = buildHtmlEmail(body);
 
   // If OAuth2 tokens are provided, use Gmail REST API (Bypasses Render SMTP Block)
   if (process.env.GMAIL_REFRESH_TOKEN) {
     const mail = new MailComposer({
-      from: `"Phishing scan" <${user}>`,
+      from: `"PhishCease" <${user}>`,
       to,
       subject: emailSubject,
-      text: JSON.stringify(body, null, 2)
+      text: "Please view this email in an HTML-compatible client.",
+      html: htmlContent
     });
     const rawBuffer = await mail.compile().build();
     const encodedMessage = rawBuffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -242,10 +312,11 @@ async function sendResultEmail(transporter, to, subject, payloadJson) {
 
   // Fallback to local SMTP (works locally, blocked on Render Free)
   await transporter.sendMail({
-    from: `"Phishing scan" <${user}>`,
+    from: `"PhishCease" <${user}>`,
     to,
     subject: emailSubject,
-    text: JSON.stringify(body, null, 2)
+    text: "Please view this email in an HTML-compatible client.",
+    html: htmlContent
   });
 }
 
