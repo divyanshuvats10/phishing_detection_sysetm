@@ -190,10 +190,15 @@ async function getGoogleAccessToken() {
     throw new Error('Missing OAuth2 credentials in .env');
   }
 
+  const params = new URLSearchParams();
+  params.append('client_id', clientId.trim());
+  params.append('client_secret', clientSecret.trim());
+  params.append('refresh_token', refreshToken.trim());
+  params.append('grant_type', 'refresh_token');
+
   const res = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `client_id=${clientId}&client_secret=${clientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`
+    body: params
   });
   const data = await res.json();
   if (data.error) {
