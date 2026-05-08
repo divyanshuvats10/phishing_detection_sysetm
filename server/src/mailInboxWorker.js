@@ -212,7 +212,10 @@ function buildHtmlEmail(body) {
     return `<div style="font-family: sans-serif; padding: 20px;"><h2>Scan Failed</h2><p>${body.error || 'Unknown error occurred.'}</p></div>`;
   }
 
-  const riskScore = body.riskScore ?? 0;
+  const logData = body.log || {};
+  const meta = logData.meta || {};
+  
+  const riskScore = logData.riskScore ?? 0;
   const isMalicious = riskScore >= 50;
   const color = isMalicious ? '#e53e3e' : '#38a169';
   const statusText = isMalicious ? 'High Risk / Malicious' : 'Safe / Clean';
@@ -234,9 +237,9 @@ function buildHtmlEmail(body) {
         <ul style="color: #4a5568; line-height: 1.8; font-size: 15px;">
   `;
 
-  if (body.results) {
-    const ml = body.results.ml_confidence;
-    const clf = body.results.classification;
+  if (meta.ml) {
+    const ml = meta.ml.score !== undefined ? meta.ml.score / 100 : undefined;
+    const clf = meta.ml.classification;
     if (clf) {
        html += `<li><strong>Classification:</strong> <span style="color: #2d3748;">${clf.toUpperCase()}</span></li>`;
     }
@@ -247,10 +250,10 @@ function buildHtmlEmail(body) {
 
   html += `</ul>`;
 
-  if (body.results && body.results.extracted_urls && body.results.extracted_urls.length > 0) {
+  if (meta.extractedUrls && meta.extractedUrls.length > 0) {
     html += `<h3 style="border-bottom: 2px solid #edf2f7; padding-bottom: 8px; color: #2d3748; margin-top: 30px; font-size: 18px;">Extracted Links Analysis</h3>`;
-    body.results.extracted_urls.forEach((u) => {
-      const uScore = u.riskScore ?? 0;
+    meta.extractedUrls.forEach((u) => {
+      const uScore = u.score ?? 0;
       const uColor = uScore >= 50 ? '#e53e3e' : '#38a169';
       html += `
         <div style="background-color: #fff; border: 1px solid #e2e8f0; border-left: 5px solid ${uColor}; padding: 15px; margin-bottom: 12px; border-radius: 6px;">
