@@ -48,7 +48,10 @@ function createTransporter() {
   const user = inboxUser();
   const pass = inboxPassword();
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // upgrade later with STARTTLS
+    requireTLS: true,
     auth: { user, pass },
     tls: { rejectUnauthorized: false }
   });
