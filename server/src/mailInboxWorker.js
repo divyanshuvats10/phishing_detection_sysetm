@@ -32,7 +32,7 @@ function imapConfig() {
     host: 'imap.gmail.com',
     port: 993,
     tls: true,
-    tlsOptions: { rejectUnauthorized: true },
+    tlsOptions: { rejectUnauthorized: false },
     connTimeout: 60000,
     authTimeout: 30000
   };
