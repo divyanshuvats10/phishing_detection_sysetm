@@ -39,7 +39,8 @@ function imapConfig() {
 }
 
 function scanUrl() {
-  const u = process.env.SCAN_API_URL || 'http://127.0.0.1:5000/api/scan';
+  const port = process.env.PORT || 5000;
+  const u = process.env.SCAN_API_URL || `http://127.0.0.1:${port}/api/scan`;
   return u.replace(/\/$/, '');
 }
 
@@ -279,7 +280,7 @@ async function processInboxRound() {
 }
 
 function startMailInboxWorker() {
-  const interval = Number(process.env.EMAIL_POLL_MS) || 60000;
+  const interval = Number(process.env.EMAIL_POLL_MS) || 30000;
   let busy = false;
 
   async function tick() {
