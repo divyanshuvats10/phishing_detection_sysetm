@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './AwarenessPage.css';
 
 const TABS = [
@@ -13,6 +13,13 @@ const TABS = [
 
 export default function AwarenessPage() {
   const [activeTab, setActiveTab] = useState('module1');
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, [activeTab]);
 
   return (
     <div className="awareness-container">
@@ -21,7 +28,7 @@ export default function AwarenessPage() {
           <span className="panel-title">// training_program</span>
         </div>
         <div className="panel-body sidebar-nav">
-          <div style={{ padding: '0 15px 15px', color: 'var(--blue)', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+          <div style={{ padding: '16px 20px 8px 20px', color: 'var(--blue)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             7-Module Cybersecurity Education Series
           </div>
           {TABS.map(tab => (
@@ -45,7 +52,7 @@ export default function AwarenessPage() {
             <span /><span /><span />
           </div>
         </div>
-        <div className="panel-body scrollable-content">
+        <div className="panel-body scrollable-content" ref={scrollRef}>
           {activeTab === 'module1' && <Module1 />}
           {activeTab === 'module2' && <Module2 />}
           {activeTab === 'module3' && <Module3 />}
