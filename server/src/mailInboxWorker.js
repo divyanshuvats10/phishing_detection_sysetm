@@ -5,6 +5,7 @@ const path = require('path');
 const Imap = require('imap');
 const { simpleParser } = require('mailparser');
 const nodemailer = require('nodemailer');
+const MailComposer = require('nodemailer/lib/mail-composer');
 const fetch = require('node-fetch');
 
 const DATA_DIR = path.join(__dirname, '..', '.data');
@@ -180,13 +181,65 @@ function scanJsonForEmailReply(payload) {
   return o;
 }
 
+async function getGoogleAccessToken() {
+  const clientId = process.env.GMAIL_CLIENT_ID;
+  const clientSecret = process.env.GMAIL_CLIENT_SECRET;
+  const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
+  
+  if (!clientId || !clientSecret || !refreshToken) {
+    throw new Error('Missing OAuth2 credentials in .env');
+  }
+
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `client_id=${clientId}&client_secret=${clientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`
+  });
+  const data = await res.json();
+  if (data.error) {
+    throw new Error(`OAuth2 error: ${data.error_description || data.error}`);
+  }
+  return data.access_token;
+}
+
 async function sendResultEmail(transporter, to, subject, payloadJson) {
   const user = inboxUser();
   const body = scanJsonForEmailReply(payloadJson);
+  const emailSubject = `[PhishingScan Result] Re: ${subject || '(no subject)'}`;
+
+  // If OAuth2 tokens are provided, use Gmail REST API (Bypasses Render SMTP Block)
+  if (process.env.GMAIL_REFRESH_TOKEN) {
+    const mail = new MailComposer({
+      from: `"Phishing scan" <${user}>`,
+      to,
+      subject: emailSubject,
+      text: JSON.stringify(body, null, 2)
+    });
+    const rawBuffer = await mail.compile().build();
+    const encodedMessage = rawBuffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    
+    const token = await getGoogleAccessToken();
+    const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ raw: encodedMessage })
+    });
+    
+    if (!res.ok) {
+      const errTxt = await res.text();
+      throw new Error(`Gmail API failed: ${errTxt}`);
+    }
+    return;
+  }
+
+  // Fallback to local SMTP (works locally, blocked on Render Free)
   await transporter.sendMail({
     from: `"Phishing scan" <${user}>`,
     to,
-    subject: `[PhishingScan Result] Re: ${subject || '(no subject)'}`,
+    subject: emailSubject,
     text: JSON.stringify(body, null, 2)
   });
 }
