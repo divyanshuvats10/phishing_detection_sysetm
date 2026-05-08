@@ -49,7 +49,8 @@ function createTransporter() {
   const pass = inboxPassword();
   return nodemailer.createTransport({
     service: 'gmail',
-    auth: { user, pass }
+    auth: { user, pass },
+    tls: { rejectUnauthorized: false }
   });
 }
 
