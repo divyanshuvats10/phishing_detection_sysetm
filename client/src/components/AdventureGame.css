@@ -1,0 +1,125 @@
+.simulator-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.scenario-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.scenario-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.scenario-card:hover {
+  border-color: var(--blue);
+  transform: translateY(-2px);
+}
+
+.scenario-title {
+  color: var(--blue);
+  font-size: 18px;
+  margin-bottom: 8px;
+  font-family: var(--mono);
+}
+
+.scenario-desc {
+  color: var(--text2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.story-node {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.story-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text);
+  margin-bottom: 30px;
+  background: var(--bg3);
+  padding: 24px;
+  border-left: 4px solid var(--blue);
+  white-space: pre-wrap;
+}
+
+.choices-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.choice-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 16px 20px;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.choice-btn:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--text);
+  color: var(--text);
+  padding-left: 24px;
+}
+
+.feedback-node {
+  text-align: center;
+  padding: 40px 20px;
+  animation: slideUp 0.5s ease-out;
+}
+
+.feedback-node.success {
+  border: 1px solid var(--green3);
+  background: rgba(0, 255, 136, 0.05);
+}
+
+.feedback-node.failure {
+  border: 1px solid rgba(255, 50, 50, 0.3);
+  background: rgba(255, 50, 50, 0.05);
+}
+
+.feedback-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+}
+
+.success .feedback-title { color: var(--green); }
+.failure .feedback-title { color: var(--red); }
+
+.feedback-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text2);
+  margin-bottom: 30px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

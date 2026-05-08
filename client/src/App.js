@@ -5,6 +5,7 @@ import ResultView from './components/ResultView';
 import LogsPage from './components/LogsPage';
 import AwarenessPage from './components/AwarenessPage';
 import GamePage from './components/GamePage';
+import AdventureGame from './components/AdventureGame';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import AdminDashboard from './components/AdminDashboard';
@@ -69,6 +70,7 @@ function AppContent() {
                 <Link to="/logs" className={`nav-link ${path === '/logs' ? 'active' : ''}`}>// LOGS</Link>
                 <Link to="/awareness" className={`nav-link ${path === '/awareness' ? 'active' : ''}`}>// AWARENESS</Link>
                 <Link to="/training" className={`nav-link ${path === '/training' ? 'active' : ''}`}>// TRAINING</Link>
+                <Link to="/simulator" className={`nav-link ${path === '/simulator' ? 'active' : ''}`}>// SIMULATOR</Link>
                 <div className="nav-divider" style={{ width: '1px', height: '20px', background: 'var(--border)', margin: '0 8px' }}></div>
                 {user ? (
                   <>
@@ -127,6 +129,7 @@ function AppContent() {
           <Route path="/logs" element={<LogsPage />} />
           <Route path="/awareness" element={<AwarenessPage />} />
           <Route path="/training" element={<GamePage />} />
+          <Route path="/simulator" element={<AdventureGame />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
