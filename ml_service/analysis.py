@@ -102,7 +102,14 @@ def simple_analyze(input_type, raw):
                 'paypal.com', 'chase.com', 'bankofamerica.com', 'wellsfargo.com', 'stripe.com'
             }
             
-            if domain in allowlist:
+            # Check if domain matches allowlist exactly OR is a valid subdomain
+            is_allowed = False
+            for allowed in allowlist:
+                if domain == allowed or domain.endswith('.' + allowed):
+                    is_allowed = True
+                    break
+            
+            if is_allowed:
                 return {
                     'classification': 'legitimate',
                     'score': 0,
