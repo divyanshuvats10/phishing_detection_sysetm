@@ -5,11 +5,12 @@ PhishCease is a comprehensive, full-stack application designed to detect and rep
 ## 🚀 Features
 
 - **Real-Time Threat Analysis:** Submit URLs, emails, or messages for instant analysis.
-- **Machine Learning Engine:** Dedicated Python microservice utilizing XGBoost and Scikit-Learn to accurately classify threats.
-- **Threat Intelligence Integration:** Enriches scan results with data from external APIs like VirusTotal and Have I Been Pwned.
+- **Custom Local Machine Learning:** Dedicated Python microservice utilizing a Random Forest model trained locally on 235k entries to accurately classify text and URL threats.
+- **Automated Threat Intelligence Mailbox:** A zero-touch asynchronous Node.js worker that monitors a Gmail inbox via the Gmail REST API, automatically scans incoming emails, and replies with formatted HTML threat reports.
 - **Interactive Dashboard:** View historical scan logs, data visualizations, and overall security posture.
-- **Educational Module:** Dedicated phishing awareness module to educate users on recognizing common cyber threats.
-- **Secure Authentication:** User authentication and session management to protect sensitive scan logs and personalize the user experience.
+- **Educational Module:** A comprehensive 7-Module Cybersecurity Education Series to train users on recognizing advanced threats (AI Deepfakes, Vishing, etc.).
+- **Incident Simulator:** An interactive "Choose Your Own Adventure" gamified simulator to test users against real-world social engineering scenarios.
+- **Secure Authentication:** User authentication and session management using JWT (JSON Web Tokens) to protect sensitive logs and personalize the user experience.
 - **Containerized Deployment:** Fully Dockerized stack for seamless setup and environment consistency.
 
 ## 🛠️ Technology Stack
@@ -22,11 +23,11 @@ PhishCease is a comprehensive, full-stack application designed to detect and rep
 
 ## 🏗️ Architecture Workflow
 
-1. The user submits suspicious content via the **React Frontend**.
+1. The user submits suspicious content via the **React Frontend**, OR forwards an email to the **Automated Threat Mailbox**.
 2. The **Node.js Backend** receives the payload and logs a preliminary `ScanLog` to **MongoDB**.
-3. The backend forwards the content to the **Python ML Microservice** for deep predictive analysis.
+3. The backend forwards the content to the **Python ML Microservice** for deep predictive analysis (Random Forest evaluation).
 4. The backend concurrently queries **Threat Intelligence APIs** (e.g., VirusTotal) for existing vulnerability reports.
-5. All insights are consolidated, updated in the database, and returned to the user's dashboard.
+5. All insights are consolidated, updated in the database, and returned to the user's dashboard (or emailed back automatically via the Gmail REST API).
 
 ## ⚙️ Prerequisites
 
@@ -113,8 +114,13 @@ ML_SERVICE_URL=http://localhost:9000
 # Threat Intelligence APIs
 VIRUSTOTAL_KEY=<your_virustotal_api_key>
 HIBP_API_KEY=<your_hibp_api_key>
+
+# Automated Mailbox API (Google Cloud Console)
+GMAIL_CLIENT_ID=<your_gmail_client_id>
+GMAIL_CLIENT_SECRET=<your_gmail_client_secret>
+GMAIL_REFRESH_TOKEN=<your_gmail_refresh_token>
 ```
-*Note: The backend gracefully handles missing keys, but will skip external API lookups.*
+*Note: The backend gracefully handles missing keys, but will skip external API/Mailbox features.*
 
 ## 📚 API Endpoints
 

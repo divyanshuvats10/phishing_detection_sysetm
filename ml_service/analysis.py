@@ -80,13 +80,26 @@ def simple_analyze(input_type, raw):
                 domain = domain[4:]
                 
             allowlist = {
-                'google.com', 'facebook.com', 'youtube.com', 'github.com', 
-                'amazon.com', 'twitter.com', 'linkedin.com', 'instagram.com',
-                'microsoft.com', 'apple.com', 'netflix.com', 'wikipedia.org',
-                'yahoo.com', 'reddit.com', 'bing.com', 'whatsapp.com',
-                'spotify.com', 'twitch.tv', 'adobe.com', 'office.com',
-                'zoom.us', 'cloudflare.com', 'medium.com', 'nytimes.com',
-                'discord.com', 'slack.com', 'aws.amazon.com', 'dropbox.com'
+                # General / Social / Media
+                'google.com', 'facebook.com', 'youtube.com', 'twitter.com', 'linkedin.com', 
+                'instagram.com', 'reddit.com', 'bing.com', 'whatsapp.com', 'spotify.com', 
+                'twitch.tv', 'netflix.com', 'wikipedia.org', 'yahoo.com', 'tiktok.com', 
+                'pinterest.com', 'quora.com', 'vimeo.com', 'medium.com', 'nytimes.com',
+                
+                # Tech / Dev / Cloud
+                'github.com', 'microsoft.com', 'apple.com', 'adobe.com', 'office.com', 
+                'zoom.us', 'cloudflare.com', 'discord.com', 'slack.com', 'aws.amazon.com', 
+                'dropbox.com', 'mongodb.com', 'vercel.com', 'render.com', 'netlify.com', 
+                'heroku.com', 'docker.com', 'kubernetes.io', 'stackoverflow.com', 
+                'gitlab.com', 'bitbucket.org', 'atlassian.com',
+                
+                # Study / Education
+                'coursera.org', 'edx.org', 'udemy.com', 'khanacademy.org', 'quizlet.com', 
+                'chegg.com', 'instructure.com', 'blackboard.com', 'mit.edu', 'stanford.edu', 
+                'harvard.edu', 'researchgate.net', 'academia.edu',
+                
+                # Finance / Trust (Safe if exact match)
+                'paypal.com', 'chase.com', 'bankofamerica.com', 'wellsfargo.com', 'stripe.com'
             }
             
             if domain in allowlist:
