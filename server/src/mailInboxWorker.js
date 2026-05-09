@@ -7,6 +7,7 @@ const { simpleParser } = require('mailparser');
 const nodemailer = require('nodemailer');
 const MailComposer = require('nodemailer/lib/mail-composer');
 const fetch = require('node-fetch');
+const { convert } = require('html-to-text');
 
 const DATA_DIR = path.join(__dirname, '..', '.data');
 const PROCESSED_FILE = path.join(DATA_DIR, 'mail-processed-ids.json');
@@ -145,7 +146,18 @@ function firstAddress(fromOrReplyTo) {
 
 function stripHtml(html) {
   if (!html) return '';
-  return String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  try {
+    return convert(html, {
+      wordwrap: false,
+      selectors: [
+        { selector: 'a', options: { ignoreHref: true } },
+        { selector: 'img', format: 'skip' }
+      ]
+    }).replace(/\s+/g, ' ').trim();
+  } catch (err) {
+    // Fallback to basic regex if html-to-text fails
+    return String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
 }
 
 function buildScanRaw(parsed) {
